@@ -1,32 +1,155 @@
 plugins {
-	id 'java'
-	id 'org.springframework.boot' version '4.0.6'
-	id 'io.spring.dependency-management' version '1.1.7'
+    // ==================================================================
+    // - This is gradle plugin section & plugins add build capabilities/features to the project
+    // - [id 'java']
+    //      - Turns the project into a Java project
+    //      - Without this, Gradle cannot build Java code
+    // - [id 'application']
+    //      - Lets you run the app like a normal Java application
+    //      - This enabled the `application` block in 2nd last section of this file
+    //      - Then you can run: ./gradlew run, for local Flink job debugging
+    // - [id 'org.springframework.boot' version '4.0.6']
+    //      - Adds Spring Boot support
+    //      - mainly useful for dependency injection/configuration, not for running embedded Tomcat
+    //      - Provides: bootRun, bootJar, executable JAR support
+    // - [id 'io.spring.dependency-management' version '1.1.7']
+    //      - Automatically manages compatible dependency versions
+    //      - Without this: implementation "org.springframework:spring-core:7.0.1"
+    //      - With this: implementation "org.springframework:spring-core"
+    // - [id 'com.gradleup.shadow' version '9.0.0-beta13']
+    //      - Adds Shadow plugin for building custom JARs
+    //      - Used to create: fat JARs, thin JARs, shaded JARs
+    //      - enables the `shadowJar` block & the task `./gradlew shadowJar`
+    //      - Very important in Flink projects because:
+    //          - you usually want Kafka/Jackson bundled
+    //          - but NOT Flink runtime bundled
+    // ==================================================================
+    id 'java'
+    id 'application'
+    id 'org.springframework.boot' version '4.0.6'
+    id 'io.spring.dependency-management' version '1.1.7'
+    id 'com.gradleup.shadow' version '9.0.0-beta13'
 }
 
 group = 'com.flink-forge'
-version = '0.0.1-SNAPSHOT'
+version = '0.0.1'
 
 java {
-	toolchain {
-		languageVersion = JavaLanguageVersion.of(21)
-	}
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+ext {
+    // ==================================================================
+    // - Defines a reusable variables
+    // - Benefits : easier upgrades, single source of truth, avoids version mismatch & repeating
+    // ==================================================================
+    flinkVersion = '2.2.0'
 }
 
 repositories {
-	mavenCentral()
+    mavenCentral()
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter'
-	compileOnly 'org.projectlombok:lombok'
-	annotationProcessor 'org.projectlombok:lombok'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testCompileOnly 'org.projectlombok:lombok'
-	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-	testAnnotationProcessor 'org.projectlombok:lombok'
+
+    // =========================
+    // Spring Boot
+    // =========================
+    implementation 'org.springframework.boot:spring-boot-starter'
+
+    // ==================================================================
+    // Flink Core dependencies – use 'implementation' for local testing
+    // but they will be excluded from the shadow JAR later
+    // 1. flink-streaming-java :
+    //      - is the core Apache Flink library for building stream processing applications using the Java DataStream API
+    //      - It provides APIs like: DataStream, StreamExecutionEnvironment, map, filter, keyBy, window, process, sinkTo etc.
+    //      - it is different from `flink-java`, as `flink-java` is batch-processing oriented
+    //      - but flink-streaming-java is for stream processing
+    // 2. flink-clients :
+    //      - acts as the bridge between the Java code and the Flink cluster
+    //      - Provide : job submission APIs, CLI integration, local execution support etc.
+    //      - This spins up a full Flink runtime (JM & TM) inside a single JVM on your development machine
+    //
+    // 3. flink-connector-kafka :
+    //      - starting from Flink 1.15+, Kafka connector was moved out of the core Flink distribution into a separate versioned connector artifact
+    //      - is required if Flink job: reads from Kafka, writes to Kafka, uses KafkaSource, uses KafkaSink, uses Kafka serialization/deserialization schemas
+    //      - format : <connector-version>-<flink-compatibility-version>
+    //      - [4.0.1] : Kafka connector release version
+    //      - [2.0] : compatible Flink major version
+    // [NOTE]
+    //  - org.apache.flink:flink-connector-base : is not added explicitly, that is fetched transitively by flink-connector-kafka
+    //  - org.apache.flink:flink-statebackend-rocksdb : newer flink version do not need this, RocksDB is enabled via config flink config.yaml
+    //
+    // ==================================================================
+    implementation "org.apache.flink:flink-streaming-java:${flinkVersion}"
+    implementation "org.apache.flink:flink-clients:${flinkVersion}"
+    implementation "org.apache.flink:flink-connector-kafka:4.0.1-2.0"
+
+
+    // ==================================================================
+    // [Utils]
+    // - Lombok for annotations
+    // - Jackson for JSON parsing
+    // ==================================================================
+    implementation 'com.fasterxml.jackson.core:jackson-databind'
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    testCompileOnly 'org.projectlombok:lombok'
+    testAnnotationProcessor 'org.projectlombok:lombok'
+
+    // ==================================================================
+    // Testing only
+    // ==================================================================
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
+
+// Disable the standard Spring Boot fat JAR (bootJar) because we use shadowJar
+tasks.bootJar.enabled = false
+
+
+shadowJar {
+    // ==================================================================
+    // - shadowJar = plugin that normally creates a fat JAR (all dependencies bundled)
+    // - However, in this specific configuration, we are excluding certain Flink dependencies to produce a thin JAR
+    // - Bcz, they are provided by the Flink-cluster
+    // ==================================================================
+
+    archiveBaseName.set('flink-forge')  // resultant JAR name is `flink-forge-xxx.jar`
+    archiveClassifier.set('')           // Removes default suffix like `*-app-all.jar`
+    archiveVersion.set(project.version) // Adds version to JAR file : `*-1.0.0.jar`
+
+    // Flink + Kafka + Jackson all use: META-INF/services/*
+    // Without merging: plugins override each other ❌, serializers / connectors break ❌
+    //With merging: all service definitions combined ✔
+    mergeServiceFiles()
+
+    // Do NOT package Flink itself inside my JAR
+    dependencies {
+        exclude(dependency('org.apache.flink:flink-core:.*'))
+        exclude(dependency('org.apache.flink:flink-java:.*'))
+        exclude(dependency('org.apache.flink:flink-streaming-java:.*'))
+        exclude(dependency('org.apache.flink:flink-clients:.*'))
+    }
+}
+
+
+application {
+    // ==================================================================
+    // -Normally Flink jobs are: Packaged as JAR & Submitted to Flink cluster
+    // - But this `application` block enables: Run Flink job like a normal Java app (local mode / debugging)
+    // - command gradle run	is for : Local JVM (IDE-style execution)
+    // - command flink run is for : job.jar	Submitted to Flink cluster
+    // - This does NOT replace cluster deployment. In production: flink run job.jar still required
+    // - TLDR : This tells Gradle which class contains main() so I can run my Flink job like a normal Java program locally
+    // ==================================================================
+    mainClass = 'com.flinkpoc.example3.Example3Main'
+}
+
+
 tasks.named('test') {
-	useJUnitPlatform()
+    useJUnitPlatform()
 }

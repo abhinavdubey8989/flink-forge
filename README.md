@@ -4,10 +4,11 @@
 Build and experiment with real-time stream processing applications using Apache Flink, Kafka, Docker, and observability tools while exploring stateful processing, checkpointing, scalability, and performance tuning.
 
 ## Tech Stack
-| Technology | Version |
-|---|---|
-| Apache Flink | 2.2 |
-| Java | 21 |
+| Technology     | Version |
+|----------------|---|
+| Apache Flink   | 2.2 |
+| Java           | 21 |
+| Spring version | 4.0.6 |
 
 
 ## Directory Structure
@@ -27,7 +28,7 @@ Build and experiment with real-time stream processing applications using Apache 
 - Assuming the host machine has multiple java version managed using `jenv`, below are the `jenv` commands
 
 ```
-# 1. Check jev version
+# 1. Check jevn version (this is NOT the java version)
 jenv --version
 
 # 2. get list of java version on host machine
