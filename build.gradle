@@ -85,7 +85,10 @@ dependencies {
     // ==================================================================
     implementation "org.apache.flink:flink-streaming-java:${flinkVersion}"
     implementation "org.apache.flink:flink-clients:${flinkVersion}"
-    implementation "org.apache.flink:flink-connector-kafka:4.0.1-2.0"
+    implementation "org.apache.flink:flink-connector-base:${flinkVersion}"
+    implementation("org.apache.flink:flink-connector-kafka:4.0.1-2.0") {
+        exclude group: 'at.yawk.lz4', module: 'lz4-java'
+    }
 
 
     // ==================================================================
@@ -109,6 +112,13 @@ dependencies {
 
 // Disable the standard Spring Boot fat JAR (bootJar) because we use shadowJar
 tasks.bootJar.enabled = false
+tasks.jar.enabled = false
+tasks.bootDistZip.enabled = false
+tasks.bootDistTar.enabled = false
+tasks.bootStartScripts.enabled = false
+tasks.distTar.enabled = false
+tasks.distZip.enabled = false
+tasks.startScripts.enabled = false
 
 
 shadowJar {
@@ -144,12 +154,15 @@ application {
     // - command gradle run	is for : Local JVM (IDE-style execution)
     // - command flink run is for : job.jar	Submitted to Flink cluster
     // - This does NOT replace cluster deployment. In production: flink run job.jar still required
+    // - Format : Fully qualified class name ie : <package>.<class having main()>
     // - TLDR : This tells Gradle which class contains main() so I can run my Flink job like a normal Java program locally
     // ==================================================================
-    mainClass = 'com.flinkpoc.example3.Example3Main'
+    mainClass = 'com.flink_forge.simple_flink_pipeline.SimpleFlinkPipelineMain'
 }
 
 
 tasks.named('test') {
-    useJUnitPlatform()
+    // Don't want tests right now
+    // useJUnitPlatform()
+    enabled = false
 }

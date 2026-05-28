@@ -53,3 +53,10 @@ java --version
 ```
 ./gradlew clean build
 ```
+
+
+- Run in local mode as java application (for debugging), ie not submit JAR to flink
+```
+# Note : The class having the main() need to be correctly specifier in build.gradle, in the `application` block
+./gradlew run
+```
