@@ -34,3 +34,8 @@ out/
 
 ### VS Code ###
 .vscode/
+
+
+### Config ###
+**/application-local.properties
+**/application-docker.properties
