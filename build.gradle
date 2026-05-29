@@ -121,6 +121,19 @@ tasks.distZip.enabled = false
 tasks.startScripts.enabled = false
 
 
+sourceSets {
+    // ==================================================================
+    // Exclude the below from being copied into the JAR
+    // resources/notes & 'README.md' are intended only for documentation
+    // ==================================================================
+    main {
+        resources {
+            exclude 'notes/**'
+            exclude 'README.md'
+        }
+    }
+}
+
 shadowJar {
     // ==================================================================
     // - shadowJar = plugin that normally creates a fat JAR (all dependencies bundled)
@@ -133,8 +146,8 @@ shadowJar {
     archiveVersion.set(project.version) // Adds version to JAR file : `*-1.0.0.jar`
 
     // Flink + Kafka + Jackson all use: META-INF/services/*
-    // Without merging: plugins override each other ❌, serializers / connectors break ❌
-    //With merging: all service definitions combined ✔
+    // Without merging: plugins override each other, serializers / connectors break
+    // With merging: all service definitions combined
     mergeServiceFiles()
 
     // Do NOT package Flink itself inside my JAR
