@@ -14,6 +14,8 @@ Build and experiment with real-time stream processing applications using Apache 
 ## Directory Structure
 
 ```text
+docs
+└── images
 src
 └── main
     ├── java
@@ -44,7 +46,7 @@ src
   - eg: `application-local.properties` when running as Java app & not submitting the job to flink cluster
   - `application-docker.properties` when the JAR is submitted to a containerised flink cluster
   - `notes` contains adhoc readme files, these are not bundled into the final JAR (handled via `build.gradle`)
-
+- Images & other miscellaneous files are present under `docs`
 
 
 ## Other References
