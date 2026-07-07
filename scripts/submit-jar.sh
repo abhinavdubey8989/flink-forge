@@ -90,7 +90,7 @@ submit_job() {
   echo "Fully qualified class-name=[$FULL_CLASS_NAME]"
 
   docker exec -it $FLINK_JM_CONTAINER_NAME \
-    flink run \
+    flink run -d \
     -c "$FULL_CLASS_NAME" \
     "$CONTAINER_JAR_DIR/$JAR_FILE_NAME"
 }
