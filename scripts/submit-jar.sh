@@ -75,9 +75,9 @@ copy_jar(){
   # Copies JAR from the host-machine dir-1 to host-machine dir-1
   # dir-1 is the directory where the JAR is available after building
   # dir-2 is the bind-mount dir on host-machine for flink job-manager (JM) & task-manager (TM) docker containers
-  # By running this single command, the JAR will be copied inside all the JM & TM containers
-  # Another approach would be to run "docker cp" & copy JAR to all TM & JM, but that will need to run multiple CLI commands
-  cp "$HOST_JAR_FILE_DIR/$JAR_FILE_NAME" "$HOST_FLINK_BIND_MOUNT_DIR/"
+  # By running this single command, the JAR will be copied inside all the JM containers
+  # Another approach would be to run "docker cp" & copy JAR to all JM, but that will need to run multiple CLI commands
+  cp "$HOST_JAR_FILE_DIR/$JAR_FILE_NAME" "$HOST_FLINK_BIND_MOUNT_DIR_FOR_JAR/"
 }
 
 
@@ -91,8 +91,8 @@ submit_job() {
 
   docker exec -it $FLINK_JM_CONTAINER_NAME \
     flink run \
-    -d "$FULL_CLASS_NAME" \
-    "/opt/flink/job-jars/$JAR_FILE_NAME.jar"
+    -c "$FULL_CLASS_NAME" \
+    "$CONTAINER_JAR_DIR/$JAR_FILE_NAME"
 }
 
 
@@ -109,6 +109,8 @@ main() {
 
     # Submit the Flink job
     submit_job
+
+    echo "JAR submitted to flink-cluster !!"
 }
 
 main "$@"
