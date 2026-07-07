@@ -123,13 +123,12 @@ tasks.startScripts.enabled = false
 
 sourceSets {
     // ==================================================================
-    // Exclude the below from being copied into the JAR
+    // From `src/main/resources` , exclude the below from being copied into the JAR
     // resources/notes & 'README.md' are intended only for documentation
     // ==================================================================
     main {
         resources {
-            exclude 'notes/**'
-            exclude 'README.md'
+            exclude '*.md'
         }
     }
 }
