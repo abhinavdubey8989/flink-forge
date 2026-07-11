@@ -20,7 +20,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 
 
 @Slf4j
-public class SimpleFlinkPipelineMain {
+public class SimpleFlinkPipeline {
 
 
     private static KafkaSource<String> createKafkaSource(KafkaDetails kafkaDetails) {
@@ -140,7 +140,7 @@ public class SimpleFlinkPipelineMain {
                 .name("Kafka Sink");
 
         // Step-6 : start flink job
-        env.execute(ConfigUtil.get("flink.job-name"));
+        env.execute(ConfigUtil.get("job.simple-pipeline.name"));
 
 
         // Clean up Spring context after job completes

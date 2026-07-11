@@ -169,7 +169,8 @@ application {
     // - Format : Fully qualified class name ie : <package>.<class having main()>
     // - TLDR : This tells Gradle which class contains main() so I can run my Flink job like a normal Java program locally
     // ==================================================================
-    mainClass = 'com.flink_forge.simple_flink_pipeline.SimpleFlinkPipelineMain'
+    //mainClass = 'com.flink_forge.simple_flink_pipeline.SimpleFlinkPipelineMain'
+    mainClass = 'com.flink_forge.windowed_aggregation.WindowedAggregation'
 }
 
 
