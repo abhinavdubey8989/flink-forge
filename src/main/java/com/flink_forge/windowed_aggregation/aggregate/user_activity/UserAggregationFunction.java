@@ -1,4 +1,4 @@
-package com.flink_forge.windowed_aggregation.aggregate;
+package com.flink_forge.windowed_aggregation.aggregate.user_activity;
 
 
 import com.flink_forge.windowed_aggregation.dto.events.UserActivity;
@@ -35,7 +35,7 @@ public class UserAggregationFunction implements
      * @param value - the value/schema to add
      * @param accumulator - The accumulator to add the value to
      *
-     * - This fn is called (by flink) for every incoming event (ie UserActivity)
+     * - This fn is called by flink, for every incoming event (ie UserActivity)
      *
      */
     @Override

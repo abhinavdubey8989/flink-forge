@@ -4,6 +4,12 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+
+/**
+ * - Represents a single user-activity event pushed in Kafka topic
+ * - Each instance corresponds to one user action (eg: LOGIN, VIEW etc.)
+ *
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

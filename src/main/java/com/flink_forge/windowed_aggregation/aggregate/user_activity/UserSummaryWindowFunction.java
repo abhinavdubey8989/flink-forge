@@ -1,4 +1,4 @@
-package com.flink_forge.windowed_aggregation.aggregate;
+package com.flink_forge.windowed_aggregation.aggregate.user_activity;
 
 import com.flink_forge.windowed_aggregation.dto.internal.UserActivitySummary;
 import org.apache.flink.streaming.api.functions.windowing.ProcessWindowFunction;

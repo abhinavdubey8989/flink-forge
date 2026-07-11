@@ -11,8 +11,22 @@ import org.apache.flink.streaming.api.datastream.DataStream;
 import java.util.*;
 
 
+/**
+ * This class is responsible for writing/flushing the aggregated UserActivitySummary records to a Kafka topic
+ *
+ */
 public class UserActivitySummarySink {
 
+    /**
+     *
+     * @param stream - This method accepts a stream of aggregated user summaries
+     * - The method creates a Kafka sink and attaches it to this stream
+     * - setRecordSerializer(...) :
+     *      - A Kafka message consists of Topic, Key (optional), Value.
+     *      - This section tells Flink "How should a UserActivitySummary become a Kafka record?"
+     *      - Kafka stores bytes, not Java objects. So Flink needs a serializer.
+     *
+     */
     public static void create(DataStream<UserActivitySummary> stream) {
 
         KafkaSink<UserActivitySummary> sink =

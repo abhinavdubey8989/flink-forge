@@ -1,7 +1,7 @@
 package com.flink_forge.windowed_aggregation.pipeline;
 
-import com.flink_forge.windowed_aggregation.aggregate.UserAggregationFunction;
-import com.flink_forge.windowed_aggregation.aggregate.UserSummaryWindowFunction;
+import com.flink_forge.windowed_aggregation.aggregate.user_activity.UserAggregationFunction;
+import com.flink_forge.windowed_aggregation.aggregate.user_activity.UserSummaryWindowFunction;
 import com.flink_forge.windowed_aggregation.dto.events.UserActivity;
 import com.flink_forge.windowed_aggregation.dto.internal.UserActivitySummary;
 import org.apache.flink.streaming.api.datastream.DataStream;
@@ -12,6 +12,11 @@ import java.time.Duration;
 
 public class UserAggregationPipeline {
 
+    /**
+     * - The private constructor prevents someone from accidentally creating an instance
+     * - However, this is not required
+     * - Many JDK utility classes follow the same pattern
+     */
     private UserAggregationPipeline() {
     }
 

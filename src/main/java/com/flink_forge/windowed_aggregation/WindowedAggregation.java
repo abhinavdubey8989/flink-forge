@@ -2,9 +2,12 @@ package com.flink_forge.windowed_aggregation;
 
 import com.flink_forge.common.config.ConfigUtil;
 import com.flink_forge.windowed_aggregation.dto.events.UserActivity;
+import com.flink_forge.windowed_aggregation.dto.internal.EventSummary;
 import com.flink_forge.windowed_aggregation.dto.internal.UserActivitySummary;
 import com.flink_forge.windowed_aggregation.env.FlinkEnvFactory;
+import com.flink_forge.windowed_aggregation.pipeline.EventAggregationPipeline;
 import com.flink_forge.windowed_aggregation.pipeline.UserAggregationPipeline;
+import com.flink_forge.windowed_aggregation.sink.EventSummarySink;
 import com.flink_forge.windowed_aggregation.sink.UserActivitySummarySink;
 import com.flink_forge.windowed_aggregation.source.KafkaSourceConfig;
 import lombok.extern.slf4j.Slf4j;
@@ -22,9 +25,13 @@ public class WindowedAggregation {
         // kafka-source
         DataStream<UserActivity> inputStream = KafkaSourceConfig.create(env);
 
-        DataStream<UserActivitySummary> userActivitySummary = UserAggregationPipeline.build(inputStream);
+        // user-level aggregation
+        DataStream<UserActivitySummary> userActivitySummaryStream = UserAggregationPipeline.build(inputStream);
+        UserActivitySummarySink.create(userActivitySummaryStream);
 
-        UserActivitySummarySink.create(userActivitySummary);
+        // event-level aggregation
+        DataStream<EventSummary> eventSummaryStream = EventAggregationPipeline.build(inputStream);
+        EventSummarySink.create(eventSummaryStream);
 
 
         env.execute(ConfigUtil.get("job.windowed-aggregation.name"));
