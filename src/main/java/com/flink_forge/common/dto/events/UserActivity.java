@@ -1,4 +1,4 @@
-package com.flink_forge.windowed_aggregation.dto.events;
+package com.flink_forge.common.dto.events;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

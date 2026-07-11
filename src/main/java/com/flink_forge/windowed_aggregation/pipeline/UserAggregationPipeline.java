@@ -2,7 +2,7 @@ package com.flink_forge.windowed_aggregation.pipeline;
 
 import com.flink_forge.windowed_aggregation.aggregate.user_activity.UserAggregationFunction;
 import com.flink_forge.windowed_aggregation.aggregate.user_activity.UserSummaryWindowFunction;
-import com.flink_forge.windowed_aggregation.dto.events.UserActivity;
+import com.flink_forge.common.dto.events.UserActivity;
 import com.flink_forge.windowed_aggregation.dto.internal.UserActivitySummary;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.windowing.assigners.TumblingProcessingTimeWindows;

@@ -1,8 +1,8 @@
 package com.flink_forge.windowed_aggregation.source;
 
 import com.flink_forge.common.config.ConfigUtil;
-import com.flink_forge.windowed_aggregation.dto.events.UserActivity;
-import com.flink_forge.windowed_aggregation.mapper.UserActivityDeserialization;
+import com.flink_forge.common.dto.events.UserActivity;
+import com.flink_forge.common.mapper.UserActivityDeserialization;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.connector.kafka.source.KafkaSource;
 import org.apache.flink.connector.kafka.source.enumerator.initializer.OffsetsInitializer;

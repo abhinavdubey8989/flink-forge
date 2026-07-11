@@ -1,6 +1,6 @@
-package com.flink_forge.windowed_aggregation.mapper;
+package com.flink_forge.common.mapper;
 
-import com.flink_forge.windowed_aggregation.dto.events.UserActivity;
+import com.flink_forge.common.dto.events.UserActivity;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.flink.api.common.serialization.DeserializationSchema;
 import org.apache.flink.api.common.typeinfo.TypeInformation;

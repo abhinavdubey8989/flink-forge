@@ -1,7 +1,7 @@
 package com.flink_forge.windowed_aggregation;
 
 import com.flink_forge.common.config.ConfigUtil;
-import com.flink_forge.windowed_aggregation.dto.events.UserActivity;
+import com.flink_forge.common.dto.events.UserActivity;
 import com.flink_forge.windowed_aggregation.dto.internal.EventSummary;
 import com.flink_forge.windowed_aggregation.dto.internal.UserActivitySummary;
 import com.flink_forge.windowed_aggregation.env.FlinkEnvFactory;
