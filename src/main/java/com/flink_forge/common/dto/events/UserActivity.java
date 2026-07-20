@@ -1,5 +1,6 @@
 package com.flink_forge.common.dto.events;
 
+import com.flink_forge.common.enums.EventType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -17,6 +18,6 @@ public class UserActivity {
 
     private String eventId;
     private String userId;
-    private String eventType;
+    private EventType eventType;
     private long ts; // short for timestamp (epoch in milliseconds)
 }

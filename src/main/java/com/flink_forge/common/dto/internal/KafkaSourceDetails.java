@@ -7,12 +7,9 @@ import lombok.NoArgsConstructor;
 
 
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 @Builder
-public class KafkaDetails {
+public class KafkaSourceDetails {
     private String bootstrapServers;
     private String srcTopic;
-    private String sinkTopic;
     private String groupId;
 }

@@ -1,5 +1,6 @@
 package com.flink_forge.windowed_aggregation.aggregate.event_activity;
 
+import com.flink_forge.common.enums.EventType;
 import com.flink_forge.windowed_aggregation.dto.internal.EventSummary;
 import org.apache.flink.streaming.api.functions.windowing.ProcessWindowFunction;
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
@@ -11,13 +12,13 @@ public class EventSummaryWindowFunction extends
         ProcessWindowFunction<
                 Long,
                 EventSummary,
-                String,
+                String, // event-type : enum -> string
                 TimeWindow> {
 
 
     @Override
     public void process(
-            String eventName,
+            String eventType,
             Context context,
             Iterable<Long> elements,
             Collector<EventSummary> out) {
@@ -26,7 +27,7 @@ public class EventSummaryWindowFunction extends
 
         out.collect(
                 new EventSummary(
-                        eventName,
+                        eventType,
                         count));
     }
 }

@@ -1,4 +1,4 @@
-package com.flink_forge.windowed_aggregation.env;
+package com.flink_forge.common.env;
 
 import com.flink_forge.common.config.ConfigUtil;
 import org.apache.flink.configuration.CheckpointingOptions;
@@ -9,6 +9,17 @@ import org.apache.flink.streaming.api.environment.CheckpointConfig;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 
 
+/**
+ *
+ * NOTE :
+ * - This is a common class to return Flink execution environment
+ * - i.e. by default all flink jobs will re-use this to generate the execution env (DRY)
+ * - If any Flink Job want to customise the behaviour, it can create its own logic/class to get
+ *   the flink execution env
+ *
+ *
+ *
+ */
 public class FlinkEnvFactory {
 
 

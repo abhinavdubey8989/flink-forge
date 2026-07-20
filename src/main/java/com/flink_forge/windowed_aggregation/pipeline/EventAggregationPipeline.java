@@ -17,7 +17,7 @@ public class EventAggregationPipeline {
     public static DataStream<EventSummary> build(
             DataStream<UserActivity> events) {
         return events
-                .keyBy(UserActivity::getEventType)
+                .keyBy(event -> event.getEventType().name()) // event-name, enum -> string
                 .window(TumblingProcessingTimeWindows.of(Duration.ofSeconds(10)))
                 .aggregate(
                         new EventCountAggregationFunction(),

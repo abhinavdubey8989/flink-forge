@@ -2,6 +2,7 @@ package com.flink_forge.windowed_aggregation.aggregate.user_activity;
 
 
 import com.flink_forge.common.dto.events.UserActivity;
+import com.flink_forge.common.enums.EventType;
 import org.apache.flink.api.common.functions.AggregateFunction;
 import java.util.*;
 
@@ -15,7 +16,7 @@ public class UserAggregationFunction implements
         AggregateFunction<
                 UserActivity, // IN - One incoming event schema
                 UserActivityAccumulator, // ACC - Internal state maintained by Flink
-                Map<String, Integer> // OUT : Final aggregation result
+                Map<EventType, Integer> // OUT : Final aggregation result
                 > {
 
 
@@ -56,7 +57,7 @@ public class UserAggregationFunction implements
      *
      */
     @Override
-    public Map<String, Integer> getResult(UserActivityAccumulator accumulator) {
+    public Map<EventType, Integer> getResult(UserActivityAccumulator accumulator) {
         return accumulator.getEventCounts();
     }
 

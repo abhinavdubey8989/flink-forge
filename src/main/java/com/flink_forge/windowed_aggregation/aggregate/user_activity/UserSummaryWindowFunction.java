@@ -1,5 +1,6 @@
 package com.flink_forge.windowed_aggregation.aggregate.user_activity;
 
+import com.flink_forge.common.enums.EventType;
 import com.flink_forge.windowed_aggregation.dto.internal.UserActivitySummary;
 import org.apache.flink.streaming.api.functions.windowing.ProcessWindowFunction;
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
@@ -9,7 +10,7 @@ import java.util.*;
 
 public class UserSummaryWindowFunction extends
         ProcessWindowFunction<
-                Map<String, Integer>, // IN - input value, in this case, result of UserAggregationFunction
+                Map<EventType, Integer>, // IN - input value, in this case, result of UserAggregationFunction
                 UserActivitySummary, // OUT - expected result schema as result of this process fn
                 String, // KEY - key from keyBy, here user-id
                 TimeWindow // W - type of window
@@ -45,11 +46,11 @@ public class UserSummaryWindowFunction extends
     public void process(
             String userId,
             Context context,
-            Iterable<Map<String, Integer>> elements,
+            Iterable<Map<EventType, Integer>> elements,
             Collector<UserActivitySummary> out) {
 
         // since elements will have only 1 item, iterator().next() gets that element
-        Map<String, Integer> eventCounts = elements.iterator().next();
+        Map<EventType, Integer> eventCounts = elements.iterator().next();
 
         // Why are we creating new HashMap<>(...)
         // - This is done to make a defensive copy

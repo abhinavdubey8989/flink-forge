@@ -1,5 +1,7 @@
 package com.flink_forge.windowed_aggregation.aggregate.user_activity;
 
+import com.flink_forge.common.enums.EventType;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -12,14 +14,14 @@ import java.util.Map;
  */
 public class UserActivityAccumulator {
 
-    private final Map<String, Integer> eventCounts = new HashMap<>();
+    private final Map<EventType, Integer> eventCounts = new HashMap<>();
 
     /**
      * - This method increments the count for a particular event type
      *   in the accumulator of a given key (i.e. user-id)
      *
      */
-    public void increment(String eventType) {
+    public void increment(EventType eventType) {
         eventCounts.merge(eventType, 1, Integer::sum);
     }
 
@@ -29,7 +31,7 @@ public class UserActivityAccumulator {
      * - The above flow internally calls this : getEventCounts fn
      *
      */
-    public Map<String, Integer> getEventCounts() {
+    public Map<EventType, Integer> getEventCounts() {
         return eventCounts;
     }
 }

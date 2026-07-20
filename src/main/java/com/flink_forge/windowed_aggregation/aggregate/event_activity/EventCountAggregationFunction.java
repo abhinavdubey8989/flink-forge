@@ -3,6 +3,7 @@ package com.flink_forge.windowed_aggregation.aggregate.event_activity;
 import com.flink_forge.common.dto.events.UserActivity;
 import org.apache.flink.api.common.functions.AggregateFunction;
 
+
 public class EventCountAggregationFunction
         implements AggregateFunction<
                 UserActivity,

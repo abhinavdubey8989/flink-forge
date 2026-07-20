@@ -3,8 +3,8 @@ package com.flink_forge.simple_flink_pipeline;
 
 import com.flink_forge.FlinkForgeApplication;
 import com.flink_forge.common.config.ConfigUtil;
-import com.flink_forge.common.config.KafkaDetailsFactory;
-import com.flink_forge.common.dto.internal.KafkaDetails;
+import com.flink_forge.common.dto.internal.KafkaSourceDetails;
+import com.flink_forge.simple_flink_pipeline.config.KafkaSourceDetailsFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
@@ -23,7 +23,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 public class SimpleFlinkPipeline {
 
 
-    private static KafkaSource<String> createKafkaSource(KafkaDetails kafkaDetails) {
+    private static KafkaSource<String> createKafkaSource(KafkaSourceDetails kafkaSourceDetails) {
         /**
          * - This method only builds a Kafka source configuration object
          * - No Kafka connection, polling, or threads start during .build()
@@ -31,9 +31,9 @@ public class SimpleFlinkPipeline {
          * - Actual Kafka consumption starts only at env.execute(JOB_NAME);
          */
         return KafkaSource.<String>builder()
-                .setBootstrapServers(kafkaDetails.getBootstrapServers())
-                .setTopics(kafkaDetails.getSrcTopic())
-                .setGroupId(kafkaDetails.getGroupId())
+                .setBootstrapServers(kafkaSourceDetails.getBootstrapServers())
+                .setTopics(kafkaSourceDetails.getSrcTopic())
+                .setGroupId(kafkaSourceDetails.getGroupId())
                 .setStartingOffsets(OffsetsInitializer.latest())
                 .setValueOnlyDeserializer(new SimpleStringSchema())
                 .build();
@@ -79,7 +79,9 @@ public class SimpleFlinkPipeline {
     }
 
 
-    private static KafkaSink<String> createKafkaSink(KafkaDetails kafkaDetails) {
+    private static KafkaSink<String> createKafkaSink(
+            KafkaSourceDetails kafkaSourceDetails,
+            String sinkTopic) {
         /**
          *
          * - This attaches a Kafka sink-operator to the processed stream
@@ -91,9 +93,9 @@ public class SimpleFlinkPipeline {
          */
 
         return KafkaSink.<String>builder()
-                .setBootstrapServers(kafkaDetails.getBootstrapServers())
+                .setBootstrapServers(kafkaSourceDetails.getBootstrapServers())
                 .setRecordSerializer(KafkaRecordSerializationSchema.builder()
-                        .setTopic(kafkaDetails.getSinkTopic())
+                        .setTopic(sinkTopic)
                         .setValueSerializationSchema(new SimpleStringSchema())
                         .build())
                 .setDeliveryGuarantee(DeliveryGuarantee.AT_LEAST_ONCE)
@@ -117,7 +119,7 @@ public class SimpleFlinkPipeline {
 
 
         // Get the KafkaDetails bean (already populated from properties)
-        KafkaDetails kafkaDetails = KafkaDetailsFactory.fromConfig();
+        KafkaSourceDetails kafkaSourceDetails = KafkaSourceDetailsFactory.fromConfig();
 
         // Step-2 : Setup flink env
         StreamExecutionEnvironment env =
@@ -128,7 +130,7 @@ public class SimpleFlinkPipeline {
         env.disableOperatorChaining();
 
         // Step-3 : Read from kafka topic as source & convert to data-stream
-        KafkaSource<String> source = createKafkaSource(kafkaDetails);
+        KafkaSource<String> source = createKafkaSource(kafkaSourceDetails);
         DataStream<String> inputStream = createInputStream(env, source);
 
         // Step-4 : Process the data-stream
@@ -136,7 +138,9 @@ public class SimpleFlinkPipeline {
 
         // Step-5 : Push to kafka sink
         processedStream
-                .sinkTo(createKafkaSink(kafkaDetails))
+                .sinkTo(createKafkaSink(
+                        kafkaSourceDetails,
+                        ConfigUtil.get("job.simple-pipeline.kafka.sink-topic")))
                 .name("Kafka Sink");
 
         // Step-6 : start flink job
