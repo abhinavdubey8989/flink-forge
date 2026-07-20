@@ -22,7 +22,6 @@ public class WindowedAggregation {
 
 
     public static void main(String[] args) throws Exception {
-        KafkaSourceConfig kafkaSourceConfig = new KafkaSourceConfig();
         StreamExecutionEnvironment env = FlinkEnvFactory.create();
 
         // Get the KafkaDetails bean (already populated from properties)

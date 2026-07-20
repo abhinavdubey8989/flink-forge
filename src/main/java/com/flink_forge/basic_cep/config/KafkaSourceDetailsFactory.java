@@ -1,4 +1,4 @@
-package com.flink_forge.windowed_aggregation.config;
+package com.flink_forge.basic_cep.config;
 
 import com.flink_forge.common.config.ConfigUtil;
 import com.flink_forge.common.dto.internal.KafkaSourceDetails;

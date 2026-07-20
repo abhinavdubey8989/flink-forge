@@ -1,4 +1,4 @@
-package com.flink_forge.simple_cep.dto;
+package com.flink_forge.basic_cep.dto;
 
 
 import lombok.AllArgsConstructor;

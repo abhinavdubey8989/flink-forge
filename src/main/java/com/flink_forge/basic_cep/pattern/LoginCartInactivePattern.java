@@ -1,13 +1,14 @@
-package com.flink_forge.simple_cep.pattern;
+package com.flink_forge.basic_cep.pattern;
 
 import com.flink_forge.common.dto.events.UserActivity;
 import com.flink_forge.common.enums.EventType;
 import org.apache.flink.cep.pattern.Pattern;
 import org.apache.flink.cep.pattern.conditions.SimpleCondition;
-
 import java.time.Duration;
 
+
 public class LoginCartInactivePattern {
+
     public static Pattern<UserActivity, ?> create() {
 
         return Pattern.<UserActivity>begin("login")
@@ -26,7 +27,7 @@ public class LoginCartInactivePattern {
                                 return event.getEventType() == EventType.ADD_TO_CART;
                             }
                         })
-                .oneOrMore()
+                //.oneOrMore()
                 .followedBy("inactive")
                 .where(
                         new SimpleCondition<UserActivity>() {
@@ -35,7 +36,7 @@ public class LoginCartInactivePattern {
                                 return event.getEventType() == EventType.IN_ACTIVE;
                             }
                         })
-                .within(Duration.ofMinutes(10));
+                .within(Duration.ofSeconds(5));
 
 
     }

@@ -45,12 +45,28 @@ def get_event_payload(idx, user_id=None, event_type=None):
     return event_payload
 
 
+
+def publish_specific(kafka_producer):
+    event1 = get_event_payload(idx=4001, user_id="test_u1" , event_type="LOGIN")
+    future1 = kafka_producer.send(config.kafka_topic, value=event1)
+    metadata2 = future1.get(timeout=2) # timeout in seconds
+    
+    event2 = get_event_payload(idx=4002, user_id="test_u1" , event_type="ADD_TO_CART")
+    future2 = kafka_producer.send(config.kafka_topic, value=event2)
+    metadata2 = future2.get(timeout=2) # timeout in seconds
+    
+    event3 = get_event_payload(idx=4003, user_id="test_u1" , event_type="IN_ACTIVE")
+    future3 = kafka_producer.send(config.kafka_topic, value=event3)
+    metadata3 = future3.get(timeout=2) # timeout in seconds
+
+
+
 def publish_events():
 
     success = 0
     failed = 0
     total_events_to_send = config.event_count
-    producer = create_producer()
+    kafka_producer = create_producer()
 
     for i in range(total_events_to_send):
         try:
@@ -58,14 +74,18 @@ def publish_events():
             event_payload = get_event_payload(i)
 
             # This is synchronous way of sending messages to kafka
-            # producer.send
-            # - Returns immediately after queueing the message in the producer's internal buffer
+            # kafka_producer.send
+            # - Returns immediately after queueing the message in the kafka_producer's internal buffer
             # - A background I/O thread sends the message to Kafka
             # metadata = future.get
             # - This makes the process sync
             # - future.get() blocks until that specific message has been acknowledged (or fails)
-            future = producer.send(config.kafka_topic, value=event_payload)
+            future = kafka_producer.send(config.kafka_topic, value=event_payload)
             metadata = future.get(timeout=2) # timeout in seconds
+
+            # for publishing adhoc messages
+            if i == 0:
+             publish_specific(kafka_producer)
 
             print(
                 f"[{i}/{total_events_to_send}] Sent to : "
@@ -83,10 +103,10 @@ def publish_events():
 
     # This blocks until all buffered records have been sent to Kafka (or have failed)
     # Without flush(), your program might exit while messages are still sitting in the producer's internal buffer.
-    producer.flush()
+    kafka_producer.flush()
 
-    # shuts down the Kafka producer and releases its resources.
-    producer.close()
+    # shuts down the kafka_producer and releases its resources.
+    kafka_producer.close()
 
     print(f"\nCompleted")
     print(f"Successful : {success}")

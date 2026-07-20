@@ -1,4 +1,4 @@
-package com.flink_forge.simple_cep.sink;
+package com.flink_forge.basic_cep.sink;
 
 import com.flink_forge.common.config.ConfigUtil;
 import com.flink_forge.windowed_aggregation.dto.internal.UserActivitySummary;
