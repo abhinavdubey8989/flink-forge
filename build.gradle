@@ -90,6 +90,13 @@ dependencies {
         exclude group: 'at.yawk.lz4', module: 'lz4-java'
     }
 
+    // ==================================================================
+    // Flink CEP (Complex Event Processing)
+    // Ref : https://nightlies.apache.org/flink/flink-docs-stable/docs/libs/cep/
+    // ==================================================================
+    implementation "org.apache.flink:flink-cep:${flinkVersion}"
+
+
 
     // ==================================================================
     // [Utils]
@@ -150,6 +157,7 @@ shadowJar {
     mergeServiceFiles()
 
     // Do NOT package Flink itself inside my JAR
+    // NOTE : Flink-CEP is not a part of the Flink runtime distribution and should be bundled with your application JAR
     dependencies {
         exclude(dependency('org.apache.flink:flink-core:.*'))
         exclude(dependency('org.apache.flink:flink-java:.*'))
@@ -169,7 +177,7 @@ application {
     // - Format : Fully qualified class name ie : <package>.<class having main()>
     // - TLDR : This tells Gradle which class contains main() so I can run my Flink job like a normal Java program locally
     // ==================================================================
-    //mainClass = 'com.flink_forge.simple_flink_pipeline.SimpleFlinkPipelineMain'
+    //mainClass = 'com.flink_forge.simple_flink_pipeline.SimpleFlinkPipeline'
     mainClass = 'com.flink_forge.windowed_aggregation.WindowedAggregation'
 }
 

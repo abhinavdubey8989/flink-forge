@@ -1,5 +1,6 @@
 package com.flink_forge.windowed_aggregation.dto.internal;
 
+import com.flink_forge.common.enums.EventType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,7 +20,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class EventSummary {
 
-    private String eventName;
+    private String eventType;
 
     /** Total number of occurrences of the event within the aggregation window. */
     private long count;

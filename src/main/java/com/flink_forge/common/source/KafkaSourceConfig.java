@@ -1,7 +1,8 @@
-package com.flink_forge.windowed_aggregation.source;
+package com.flink_forge.common.source;
 
 import com.flink_forge.common.config.ConfigUtil;
 import com.flink_forge.common.dto.events.UserActivity;
+import com.flink_forge.common.dto.internal.KafkaSourceDetails;
 import com.flink_forge.common.mapper.UserActivityDeserialization;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.connector.kafka.source.KafkaSource;
@@ -28,16 +29,14 @@ public class KafkaSourceConfig {
      *      - Without this deserializer, Flink would only see raw bytes
      */
     public static DataStream<UserActivity> create(
-            StreamExecutionEnvironment env) {
+            StreamExecutionEnvironment env,
+            KafkaSourceDetails kafkaSourceDetails) {
 
         KafkaSource<UserActivity> source =
                 KafkaSource.<UserActivity>builder()
-                        .setBootstrapServers(ConfigUtil.get("kafka.bootstrap-servers"))
-                        .setTopics(ConfigUtil.get("kafka.src-topic"))
-                        .setGroupId(ConfigUtil.getDefaultOrJobSpecificConfig(
-                                "kafka.group-id",
-                                "job.windowed-aggregation.kafka.group-id"
-                        ))
+                        .setBootstrapServers(kafkaSourceDetails.getBootstrapServers())
+                        .setTopics(kafkaSourceDetails.getSrcTopic())
+                        .setGroupId(kafkaSourceDetails.getGroupId())
                         .setStartingOffsets(OffsetsInitializer.latest())
                         .setValueOnlyDeserializer(new UserActivityDeserialization())
                         .build();

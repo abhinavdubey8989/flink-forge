@@ -1,5 +1,6 @@
 package com.flink_forge.windowed_aggregation.dto.internal;
 
+import com.flink_forge.common.enums.EventType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -27,5 +28,5 @@ public class UserActivitySummary {
      * }
      *
      */
-    private Map<String, Integer> eventCounts;
+    private Map<EventType, Integer> eventCounts;
 }
