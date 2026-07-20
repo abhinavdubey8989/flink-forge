@@ -48,5 +48,14 @@ public class ConfigUtil {
         }
         return value;
     }
+
+
+    public static String getDefaultOrJobSpecificConfig(
+            String defaultConfigKey,
+            String jobConfigKey) {
+        String defaultConfigVal = (defaultConfigKey == null || defaultConfigKey.isBlank()) ? null : get(defaultConfigKey);
+        String jobConfigVal = (jobConfigKey == null || jobConfigKey.isBlank()) ? null : get(jobConfigKey);
+        return (jobConfigVal == null) ? defaultConfigVal : jobConfigVal;
+    }
 }
 

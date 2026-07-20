@@ -34,8 +34,10 @@ out/
 
 ### VS Code ###
 .vscode/
+temp/
 
 
-### Config ###
+### Config/env files ###
 **/application-local.properties
 **/application-docker.properties
+scripts/python/.env

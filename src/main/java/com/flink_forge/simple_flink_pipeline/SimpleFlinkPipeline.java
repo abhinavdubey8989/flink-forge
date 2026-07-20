@@ -20,7 +20,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 
 
 @Slf4j
-public class SimpleFlinkPipelineMain {
+public class SimpleFlinkPipeline {
 
 
     private static KafkaSource<String> createKafkaSource(KafkaDetails kafkaDetails) {
@@ -106,9 +106,15 @@ public class SimpleFlinkPipelineMain {
         // Before this: no Spring, no beans, no Environment (as needed in ConfigUtil)
         // After this: Spring fully initialized
         // FlinkForgeApplication.class : This tells Spring to start scanning from this class/package
-        // We STILL need it even when submitting the JAR to Flink,
-        ConfigurableApplicationContext context =
-                SpringApplication.run(FlinkForgeApplication.class, args);
+        // We STILL need it even when submitting the JAR to Flink
+        // [Why app.setRegisterShutdownHook(false) is done ?]
+        // Register a JVM shutdown hook (A shutdown hook is simply a thread that the JVM executes just before the process terminates)
+        // Spring Boot automatically registers one
+        // We were getting classLoader error when running "flink run -d ..." (ie detached mode), so now we are not registering shutdown hook
+        SpringApplication app = new SpringApplication(FlinkForgeApplication.class);
+        app.setRegisterShutdownHook(false);
+        ConfigurableApplicationContext context = app.run(args);
+
 
         // Get the KafkaDetails bean (already populated from properties)
         KafkaDetails kafkaDetails = KafkaDetailsFactory.fromConfig();
@@ -134,7 +140,13 @@ public class SimpleFlinkPipelineMain {
                 .name("Kafka Sink");
 
         // Step-6 : start flink job
-        env.execute(ConfigUtil.get("flink.job-name"));
+        env.execute(ConfigUtil.get("job.simple-pipeline.name"));
+
+
+        // Clean up Spring context after job completes
+        // This is needed bcz : you've disabled the automatic cleanup, you become responsible for closing the context.
+        // & Spring will never clean itself up automatically when the shutdown hook is disabled
+        context.close();
     }
 
 }
