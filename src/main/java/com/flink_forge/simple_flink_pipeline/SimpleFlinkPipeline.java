@@ -117,19 +117,25 @@ public class SimpleFlinkPipeline {
         app.setRegisterShutdownHook(false);
         ConfigurableApplicationContext context = app.run(args);
 
-
-        // Get the KafkaDetails bean (already populated from properties)
+        // Get the KafkaSourceDetails
         KafkaSourceDetails kafkaSourceDetails = KafkaSourceDetailsFactory.fromConfig();
 
-        // Step-2 : Setup flink env
+        // Step-2 : Create StreamExecutionEnvironment
+        // - it's the entry point for every Flink streaming application
+        // - Its responsibilities include:
+        //      - creating sources and sinks
+        //      - configuring parallelism, checkpoints, state backend, etc.
+        // NOTE : Nothing actually starts here, we're only describing the pipeline
         StreamExecutionEnvironment env =
                 StreamExecutionEnvironment.getExecutionEnvironment();
+
         // set default parallelism for flink operator
         env.setParallelism(Integer.parseInt(ConfigUtil.get("flink.default-parallelism")));
         // prevents the UI showing only 1 block when parallelism=1
         env.disableOperatorChaining();
 
         // Step-3 : Read from kafka topic as source & convert to data-stream
+        // i.e. Every Kafka message becomes one data-stream object.
         KafkaSource<String> source = createKafkaSource(kafkaSourceDetails);
         DataStream<String> inputStream = createInputStream(env, source);
 

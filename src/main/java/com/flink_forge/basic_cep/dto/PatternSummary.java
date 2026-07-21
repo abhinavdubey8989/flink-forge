@@ -17,8 +17,12 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class LoginCartInactiveSummary {
+public class PatternSummary {
     private String userId;
-    private int cartItemCount;
-    private long lastSeen;
+    private String patternName;
+
+    // optional
+    private Integer cartItemCount;
+    private Integer abandonedCartValue;
+    private Long lastSeen;
 }

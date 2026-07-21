@@ -19,5 +19,6 @@ public class UserActivity {
     private String eventId;
     private String userId;
     private EventType eventType;
+    private Integer itemValue; // Optional
     private long ts; // short for timestamp (epoch in milliseconds)
 }

@@ -5,6 +5,8 @@ import time
 import json
 from kafka import KafkaProducer
 from config import load_config
+import random
+
 
 
 config = load_config()
@@ -23,7 +25,11 @@ def get_random_user_id():
     return f"user_{random.randint(1, config.total_users)}"
 
 
-def get_event_payload(idx, user_id=None, event_type=None):
+def get_random_number_in_range(lower_limit=10, upper_limit=51):
+    return random.randrange(lower_limit, upper_limit, 10)
+
+
+def get_event_payload(idx, user_id=None, event_type=None, item_value=None):
 
     # Set random user-id
     if user_id is None:
@@ -33,6 +39,14 @@ def get_event_payload(idx, user_id=None, event_type=None):
     if event_type is None:
         event_type = random.choice(config.event_types)
 
+    # print(event_type + " : " + )
+
+    # Set random event-type
+    if event_type == "ADD_TO_CART":
+        if item_value is None:
+            item_value = get_random_number_in_range()
+
+
     event_payload = {
         "eventId": f"{config.event_batch_id}_{idx}",
 
@@ -40,6 +54,7 @@ def get_event_payload(idx, user_id=None, event_type=None):
         # converting it into millisecond
         "ts": int(time.time() * 1000),
 
+        "itemValue": item_value,
         "userId": user_id,
         "eventType": event_type}
     return event_payload
@@ -47,17 +62,26 @@ def get_event_payload(idx, user_id=None, event_type=None):
 
 
 def publish_specific(kafka_producer):
-    event1 = get_event_payload(idx=4001, user_id="test_u1" , event_type="LOGIN")
-    future1 = kafka_producer.send(config.kafka_topic, value=event1)
-    metadata2 = future1.get(timeout=2) # timeout in seconds
+    event_id_prefix = config.event_batch_id
+
+    events = [
+        get_event_payload(idx=f"{event_id_prefix}_ab_1", user_id="test_u1", event_type="LOGIN"),
+        get_event_payload(idx=f"{event_id_prefix}_ab_2", user_id="test_u1", event_type="ADD_TO_CART", item_value=10),
+        get_event_payload(idx=f"{event_id_prefix}_ab_3", user_id="test_u1", event_type="ADD_TO_CART", item_value=10),
+        get_event_payload(idx=f"{event_id_prefix}_ab_4", user_id="test_u1", event_type="ADD_TO_CART", item_value=10),
+        get_event_payload(idx=f"{event_id_prefix}_ab_5", user_id="test_u1", event_type="IN_ACTIVE"),
+    ]
     
-    event2 = get_event_payload(idx=4002, user_id="test_u1" , event_type="ADD_TO_CART")
-    future2 = kafka_producer.send(config.kafka_topic, value=event2)
-    metadata2 = future2.get(timeout=2) # timeout in seconds
-    
-    event3 = get_event_payload(idx=4003, user_id="test_u1" , event_type="IN_ACTIVE")
-    future3 = kafka_producer.send(config.kafka_topic, value=event3)
-    metadata3 = future3.get(timeout=2) # timeout in seconds
+    futures = [
+        kafka_producer.send(config.kafka_topic, value=event)
+        for event in events
+    ]
+
+    # Wait for all sends to complete
+    for future in futures:
+        future.get(timeout=2)
+
+    kafka_producer.flush()
 
 
 
@@ -80,6 +104,7 @@ def publish_events():
             # metadata = future.get
             # - This makes the process sync
             # - future.get() blocks until that specific message has been acknowledged (or fails)
+
             future = kafka_producer.send(config.kafka_topic, value=event_payload)
             metadata = future.get(timeout=2) # timeout in seconds
 
